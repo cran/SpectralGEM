@@ -1,0 +1,4 @@
+useDynLib(SpectralGEM)
+
+export(SpectralGEM,InFile,MMfile,pc_graphs_GEMpClusters,pc_graphs_GEMp)
+
