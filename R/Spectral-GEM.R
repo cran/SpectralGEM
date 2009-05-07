@@ -2,13 +2,13 @@ installGEMcore<-function(machine="linux")
 {
   url="http://www.stat.cmu.edu/~jwu/GEMfolder/Spectral-GEM/"
   if (machine=="linux") {
-     download.file(paste(url,"linuxGEMfiles/Spectral-GEM_Rv1.2.f90",sep=""),
-                   "Spectral-GEM_Rv1.2.f90",mode="wb")
+     download.file(paste(url,"linuxGEMfiles/SpectralGEM_v2.1.f90",sep=""),
+                   "SpectralGEM_v2.1.f90",mode="wb")
      download.file(paste(url,"linuxGEMfiles/GEM_sub.f",sep=""),"GEM_sub.f")
   } else {
      if (machine=="windows") {
-     download.file(paste(url,"winGEMfiles/Spectral-GEM_Rv1.2.exe",sep=""),
-         "Spectral-GEM_Rv1.2.exe",mode="wb")
+     download.file(paste(url,"winGEMfiles/SpectralGEM_v2.1.exe",sep=""),
+         "Spectral-GEM_v2.1.exe",mode="wb")
      } else {
        cat("Error: must specify machine type\n")
        return()
@@ -36,7 +36,7 @@ SpectralGEM<-function(InputFile="matching_input.txt",machine="linux",CM="CM")
   } else {
      if (machine=="windows") { 
          main="mainw"
-         if (!file.exists("./Spectral-GEM_Rv1.2.exe")) {
+         if (!file.exists("./SpectralGEM_v2.1.exe")) {
               cat("You need to download fortran executables from\n")
               cat("http://www.stat.cmu.edu/~jwu/GEMfolder/Spectral-GEM/.\n")
               cat("Proceed to download?\n")
@@ -492,14 +492,18 @@ full_matching<-function(ext)
  idm<-names(matches)
  nr=length(idr)
  nc=length(idc)
- cc=c(rep(2,nr),rep(1,nc))
+ if (nr<nc) {
+   cc=c(rep(2,nr),rep(1,nc))
+ } else {
+   cc=c(rep(1,nr),rep(2,nc))
+ } 
  id=unlist(c(idr,idc))
  cc1=cc[order(id)]
  matches1=cbind(matches[order(idm)],cc1)
  m0=matches1[!is.na(matches1[,1]),]
  id1=as.data.frame(row.names(m0))
   m01=cbind(id1,m0)
- names(m01)<-c("sampleId","stratum","case/control")
+ names(m01)<-c("sampleId","stratum","case_2/control_1")
   return(m01)
 }
 
