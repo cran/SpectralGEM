@@ -8,7 +8,7 @@ installGEMcore<-function(machine="linux")
   } else {
      if (machine=="windows") {
      download.file(paste(url,"winGEMfiles/SpectralGEM_v2.1.exe",sep=""),
-         "Spectral-GEM_v2.1.exe",mode="wb")
+         "SpectralGEM_v2.1.exe",mode="wb")
      } else {
        cat("Error: must specify machine type\n")
        return()
@@ -492,7 +492,8 @@ full_matching<-function(ext)
  idm<-names(matches)
  nr=length(idr)
  nc=length(idc)
- if (nr<nc) {
+ x=getRecord(ext)
+ if (x$n.case < x$n.cntrl) {
    cc=c(rep(2,nr),rep(1,nc))
  } else {
    cc=c(rep(1,nr),rep(2,nc))
