@@ -10,20 +10,26 @@ the main fortran program and saves it in the current directory.
 InFile(identifier="smal",stage="1",directory="./",
                     MMfile="MMprime.txt",excludefile="exclude.txt",
                     idlength=8,mincluster=10,logtype=0,
+                    mdim=-1,msnp=-1,
                     outfile="matching_input.txt")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{identifier}{must be 4-letters long}
-  \item{stage}{must be 1-letter long}
-  \item{directory}{the directory where the files will be generated}
-  \item{MMfile}{the MMprime matrix file name}
-  \item{excludefile}{the name of the file where the outliers have been
-    or will be written to}
-  \item{idlength}{the number of letters the longest sample name has}
-  \item{mincluster}{the smallest cluster required when do clustering}
-  \item{logtype}{the type of log information output to the log file:
-    0=limited, 2=lots}
+  \item{identifier}{Must be 4-letters long.}
+  \item{stage}{Must be 1-letter long.}
+  \item{directory}{The directory where the files will be generated.}
+  \item{MMfile}{The MMprime matrix file name.}
+  \item{excludefile}{The name of the file where the outliers have been
+    or will be written.}
+  \item{idlength}{The number of letters the longest sample name has.}
+  \item{mincluster}{The smallest cluster required when do clustering, must be at least 5.}
+  \item{logtype}{The type of log information output to the log file:
+    0=limited, 2=lots.}
+  \item{mdim}{The maximum number of eigenvalues to print to the output
+    file. The default is set at -1, which prints out every eigenvalues.}
+  \item{msnp}{The number of SNPs to be used in determine the threshold
+    for the significant eigenvalues. The default is set at -1, which the
+  program estimates the value.}
   \item{outfile}{The name of the output file.}
 }
 \details{

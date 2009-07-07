@@ -1,58 +1,5 @@
-installGEMcore<-function(machine="linux") 
+SpectralGEM<-function(InputFile="matching_input.txt",CM="CM",outlier=TRUE) 
 {
-  url="http://www.stat.cmu.edu/~jwu/GEMfolder/Spectral-GEM/"
-  if (machine=="linux") {
-     download.file(paste(url,"linuxGEMfiles/SpectralGEM_v2.1.f90",sep=""),
-                   "SpectralGEM_v2.1.f90",mode="wb")
-     download.file(paste(url,"linuxGEMfiles/GEM_sub.f",sep=""),"GEM_sub.f")
-  } else {
-     if (machine=="windows") {
-     download.file(paste(url,"winGEMfiles/SpectralGEM_v2.1.exe",sep=""),
-         "SpectralGEM_v2.1.exe",mode="wb")
-     } else {
-       cat("Error: must specify machine type\n")
-       return()
-    }
-  }
-  return()
-}
-
-SpectralGEM<-function(InputFile="matching_input.txt",machine="linux",CM="CM") 
-{
-  if (machine=="linux") {
-     main="mainl"
-     if (!file.exists("./Spectral-GEM")) {
-         cat("You need to download fortran executables from\n")
-         cat("http://www.stat.cmu.edu/~jwu/GEMfolder/Spectral-GEM/.\n")
-         cat("You need to have ifort compiler otherwise try our windows version.\n")
-         cat("Proceed? Enter \"Y\" (yes) or \"N\" (no) and hit enter twice.\n")
-         get=scan(what="character")
-         if (get=="Y") {
-            installGEMcore(machine="linux")
-          } else {
-            return()
-          }
-      }
-  } else {
-     if (machine=="windows") { 
-         main="mainw"
-         if (!file.exists("./SpectralGEM_v2.1.exe")) {
-              cat("You need to download fortran executables from\n")
-              cat("http://www.stat.cmu.edu/~jwu/GEMfolder/Spectral-GEM/.\n")
-              cat("Proceed to download?\n")
-              cat("Enter \"Y\" (yes) or \"N\" (no) and hit enter twice.\n")
-              get=scan(what="character")
-              if (get=="Y") {
-                installGEMcore(machine="windows")
-              } else {
-                return()
-              }
-            }
-       } else {
-        cat("machine must be \"windows\" or \"linux\"\n")
-        return()
-     }
-  } 
   # stage 1
   # The program runs main Fortran program.
   # input: matching_input.txt
@@ -62,8 +9,8 @@ SpectralGEM<-function(InputFile="matching_input.txt",machine="linux",CM="CM")
   cl=NULL
   d=NULL
   if (CM=="C" || CM=="CM") {
-    write(c(InputFile,"C"),file="tmp00001.txt",ncolumns=1)
-    .C(main, PACKAGE = "SpectralGEM")
+    .Fortran("genetic_distance_matching", input_file=as.character(InputFile),
+     matching_answer=as.character("C"), PACKAGE = "SpectralGEM")
      ext=getVersion(InputFile)
     cat("Current version: ext=",ext,";\n")
       data=read.table(paste("clusters_",ext,".txt",sep=""),
@@ -84,11 +31,11 @@ SpectralGEM<-function(InputFile="matching_input.txt",machine="linux",CM="CM")
       ext=getVersion(InputFile);
       x=getRecord(ext)
       excludeFile=getExcludeFile(InputFile);
-      if (x$n.case>0 & x$n.cntrl>0) {
+      if (x$n.case>0 & x$n.cntrl>0 & outlier==TRUE) {
          updateExcludeFileDstr(excludeFile,ext)      
       }   
       updateInputFile(oldInputFile=InputFile,
-          newInputFile=InputFile,stage="M",excludeFile)
+          newInputFile=InputFile,excludeFile)
       ext=getVersion(InputFile);
    }
    # stage 2
@@ -98,8 +45,8 @@ SpectralGEM<-function(InputFile="matching_input.txt",machine="linux",CM="CM")
    # enter C or M        :: M
   ma=NULL
   if (CM=="M" || CM=="CM") {
-      write(c(InputFile,"M"),file="tmp00001.txt",ncolumns=1)
-     .C(main, PACKAGE = "SpectralGEM") 
+     .Fortran("genetic_distance_matching", input_file=as.character(InputFile),
+     matching_answer=as.character("M"), PACKAGE = "SpectralGEM") 
       ext=getVersion(InputFile);
      cat("Current version: ext=",ext,";\n")
            
@@ -225,13 +172,13 @@ getExcludeFile<-function(InputFile)
  excludeFile=inputlist[4]
  excludeFile=unlist(strsplit(excludeFile," "))[1]
  excludeFile=unlist(strsplit(excludeFile,"\t"))[1]
- cat("excludeFile=",excludeFile,";\n")
+ #cat("excludeFile=",excludeFile,";\n")
  return(excludeFile)
 }
 
 InFile<-function(identifier="smal",stage="1",directory="./",
                     MMfile="MMprime.txt",excludefile="exclude.txt",
-                    idlength=8,mincluster=10,logtype=0,outfile="matching_input.txt")
+                    idlength=8,mincluster=10,logtype=0,mdim=-1,msnp=-1,outfile="matching_input.txt")
 {
   if (nchar(identifier)!=4) {
       cat("Error: identifier must have 4 letters.\n")
@@ -241,15 +188,18 @@ InFile<-function(identifier="smal",stage="1",directory="./",
   if (nchar(stage)!=1) {
       cat("Error: stage must be 1 letter.\n")
    }
-  x=c(paste(identifier,stage,sep=""),directory,MMfile,excludefile,idlength,mincluster,logtype)
+  x=c(paste(identifier,stage,sep=""),directory,MMfile,excludefile,idlength,mincluster,logtype,mdim,msnp)
   write(x,file=outfile,ncolumns=1)
 }
 
-MMfile<-function(H=H,sampleInfo=id.info,outfile="MMprime.txt")
+MMfile<-function(H=H,sampleInfo=id.info,n=dim(H)[1],ntag=ntag,outfile="MMprime.txt")
 {
   nsample=dim(H)[1]
+  if (n!=nsample) {
+     cat("Error: Number of individuals does not match the matrix dimension.\n")
+     retur()
+  }
   x1=paste(nsample,":: number of individuals")
-  ntag=1000  #estimated number of tag SNPs
   x2=paste(ntag,":: number of tag SNPs")
   write(x1,file=outfile)
   write(x2,file=outfile,append=T)
@@ -258,11 +208,12 @@ MMfile<-function(H=H,sampleInfo=id.info,outfile="MMprime.txt")
 }
          
 
-updateInputFile<-function(oldInputFile,newInputFile,stage,
-  excludeFile)
+updateInputFile<-function(oldInputFile,newInputFile,excludeFile)
 {
   inputlist=loadInputFile(oldInputFile)
   ext=inputlist[1]
+  oldstage=substr(ext,5,5)
+  stage=c(1:9)[as.character(c(1:9))!=oldstage][1]
   ext=paste(substr(ext,1,4),stage,sep="");
   inputlist[1]=ext
   x=inputlist[2]
@@ -506,5 +457,11 @@ full_matching<-function(ext)
   m01=cbind(id1,m0)
  names(m01)<-c("sampleId","stratum","case_2/control_1")
   return(m01)
+}
+
+plotLam<-function(ext) {
+  task1<-read.table(paste("eigen_gap_",ext,".txt",sep=""))
+  lam = 1-task1[,2]
+  plot(lam,ylab="Eigenvalues")
 }
 

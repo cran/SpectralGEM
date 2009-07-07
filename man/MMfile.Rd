@@ -14,20 +14,22 @@ program located at
 http://wpicr.wpic.pitt.edu/WPICCompGen/MMp/MMp\_page.htm.
 }
 \usage{
-MMfile(H = H,sampleInfo = id.info,outfile = "MMprime.txt")
+MMfile(H = H,sampleInfo = id.info,n=dim(H)[1],ntag=ntag,outfile = "MMprime.txt")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{H}{A square symmetirc matrix.}
   \item{sampleInfo}{A 4-column matrix containing sample\_id, sex,
     case\_control status, and group\_id}
+  \item{n}{Number of individual in the H matrix}
+  \item{ntag}{Number of tag SNPs used to generate the H matrix.}
   \item{outfile}{The text file to write to. The default is set as
 MMprime.txt.}
 }
 \details{
   The first two lines in the output file contains the information about 
 the  square matrix. The first line is the number of individuals in the 
-matrix. The second line is the estimated number of tag snps.
+matrix. The second line is the number of tag SNPs.
   The rest of the file is a table. Each line in the table contains the 
 sample ID, gender, case/control status, group ID, and the square matrix.
 }

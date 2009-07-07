@@ -7,15 +7,16 @@
 controls for association analysis.
 }
 \usage{
-SpectralGEM(InputFile = "matching_input.txt",machine="linux",CM="CM")
+SpectralGEM(InputFile = "matching_input.txt",CM="CM",outlier=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{InputFile}{The name of the file that contains the input parameters.}
-  \item{machine}{machine type, must be either linux or windows}
   \item{CM}{options are C, M, and CM. C: for clustering only with 
 removing outliers. M: for matching only without examing the outliers. CM: 
 for clustering, removing outliers, and matching.}
+  \item{outlier}{An option to remove outliers by checking the distributions of
+    the distances between cases and contrls. Only applicable when CM="C"}
 }
 \details{
   %~~ If necessary, more details than the description above ~~
@@ -47,17 +48,18 @@ automatically downloads the executable from the reference website.}
 \examples{
 data(H)
 data(id.info)
-MMfile(H=H,sampleInfo=id.info,outfile="MMprime.txt")
+MMfile(H=H,sampleInfo=id.info,ntag=1000,outfile="MMprime.txt")
 InFile(identifier="smal",stage=1,directory="./",
                     MMfile="MMprime.txt",excludefile="exclude.txt",
                     idlength=8,mincluster=10,logtype=0,
                     outfile="matching_input.txt")
-##not run
-#out=SpectralGEM(machine="linux") #first do clustering and remove outliers
+
+#not run#
+#out=SpectralGEM() #first do clustering and remove outliers
                                  #then do matching
-#out=SpectralGEM(machine="linux",CM="C") # do clustering and remove 
+#out=SpectralGEM(CM="C") # do clustering and remove 
                                          #outliers
-#out=SpectralGEM(machine="linux",CM="M") # do matching without removing 
+#out=SpectralGEM(CM="M") # do matching without removing 
                                          #outliers
 
 # For continuous response, create new id.info for the H matrix 
@@ -67,24 +69,24 @@ y=sample(c(rnorm(mean=0,172),rnorm(mean=1,173)))
 cc=rep(1,345)
 cc[y>median(y)]=2  #create case control
 newid.info=cbind(c(1:n),rep(1,n),cc,cc)
-MMfile(H=H,sampleInfo=newid.info,outfile="MMprime1.txt")
+MMfile(H=H,sampleInfo=newid.info,ntag=1000,outfile="MMprime1.txt")
 InFile(identifier="smal",stage=1,directory="./",
                     MMfile="MMprime1.txt",excludefile="exclude.txt",
                     idlength=8,mincluster=10,logtype=0,
                     outfile="input.txt")
-##not run
-# out=SpectralGEM(InputFile="input.txt",machine="linux",CM="C") 
+#not run#
+#out=SpectralGEM(InputFile="input.txt",CM="C") 
 
 # buildin ancestry plots
-# Current version: ext= smal1 ;
-##not run
+#Current version: ext= smal1 ;
+#not run
 #pc_graphs_GEMpClusters("smal1")
 #pc_graphs_GEMp("smal1")
 
 #plot from the SpectralGEM output, 
 #significant eigenvectors start from out$U[,4] with
 #significant eigenvalues start from from out$lambda[2]
-## not run
+#not run
 #plot(sqrt(out$lambda[2])*out$U[,4],sqrt(out$lambda[3])*out$U[,5],
 #col=out$U[,2],xlab="PC 1",ylab="PC 2") #for PC plots
 }

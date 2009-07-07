@@ -6,13 +6,12 @@
   Internal function.
 }
 \usage{
-updateInputFile(oldInputFile, newInputFile, stage, excludeFile)
+updateInputFile(oldInputFile, newInputFile,excludeFile)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{oldInputFile}{ old input file name }
   \item{newInputFile}{ new input file name }
-  \item{stage}{ current stage }
   \item{excludeFile}{ exclude file name }
 }
 \details{
